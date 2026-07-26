@@ -1,0 +1,9 @@
+name = "analyze-my-resume"
+compatibility_date = "2025-01-01"
+
+# Serve the static site from ./public. Because there is no `main` Worker
+# script, Wrangler does an assets-only deploy — exactly what a single
+# HTML file needs. index.html must live inside this directory.
+[assets]
+directory = "./public"
+not_found_handling = "single-page-application"
