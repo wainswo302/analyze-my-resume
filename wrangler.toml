@@ -5,5 +5,5 @@ compatibility_date = "2025-01-01"
 # script, Wrangler does an assets-only deploy — exactly what a single
 # HTML file needs. index.html must live inside this directory.
 [assets]
-directory = "./public"
+directory = "public"
 not_found_handling = "single-page-application"
