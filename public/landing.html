@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyze My Resume — See Your Resume Through ATS Eyes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f172a;
+  --slate: #1e293b;
+  --blue: #3b82f6;
+  --sky: #0ea5e9;
+  --cyan: #06b6d4;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --text: #f8fafc;
+  --text-dim: #cbd5e1;
+  --text-muted: #94a3b8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Header */
+header {
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cta-button {
+  background: linear-gradient(135deg, var(--blue), var(--sky));
+  color: white;
+  padding: 12px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: inline-block;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+}
+
+/* Hero */
+.hero {
+  padding: 80px 0;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--text) 0%, var(--text-dim) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero h1 .highlight {
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  font-size: 20px;
+  color: var(--text-dim);
+  max-width: 700px;
+  margin: 0 auto 40px;
+}
+
+/* Problem Section */
+.problem {
+  background: var(--slate);
+  padding: 80px 0;
+}
+
+.problem h2 {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.problem-card {
+  background: var(--navy);
+  padding: 32px;
+  border-radius: 12px;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.problem-card h3 {
+  color: var(--rose);
+  font-size: 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.problem-card p {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+
+/* Solution Section */
+.solution {
+  padding: 80px 0;
+}
+
+.solution h2 {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.solution .subtitle {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 18px;
+  margin-bottom: 64px;
+}
+
+.ats-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  margin-bottom: 64px;
+}
+
+.method-card {
+  background: var(--slate);
+  padding: 36px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.method-card:hover {
+  border-color: var(--blue);
+  transform: translateY(-4px);
+}
+
+.method-number {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.method-card h3 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.method-card p {
+  color: var(--text-dim);
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.method-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.method-card li {
+  color: var(--text-muted);
+  font-size: 14px;
+  padding-left: 24px;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.method-card li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--emerald);
+  font-weight: 600;
+}
+
+/* How It Works */
+.how-it-works {
+  background: var(--slate);
+  padding: 80px 0;
+}
+
+.how-it-works h2 {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+}
+
+.step {
+  text-align: center;
+}
+
+.step-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 24px;
+  font-size: 32px;
+}
+
+.step h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.step p {
+  color: var(--text-dim);
+  font-size: 15px;
+}
+
+/* Features */
+.features {
+  padding: 80px 0;
+}
+
+.features h2 {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.features .subtitle {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 18px;
+  margin-bottom: 64px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.feature {
+  background: var(--slate);
+  padding: 28px;
+  border-radius: 12px;
+  border-left: 4px solid var(--blue);
+}
+
+.feature h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature p {
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 100px 0;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1));
+}
+
+.cta-section h2 {
+  font-size: 42px;
+  margin-bottom: 24px;
+}
+
+.cta-section p {
+  font-size: 18px;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+}
+
+.cta-section .cta-button {
+  font-size: 18px;
+  padding: 16px 40px;
+}
+
+/* Footer */
+footer {
+  padding: 40px 0;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .hero p {
+    font-size: 16px;
+  }
+
+  .problem h2,
+  .solution h2,
+  .how-it-works h2,
+  .features h2 {
+    font-size: 28px;
+  }
+
+  .cta-section h2 {
+    font-size: 32px;
+  }
+}
+</style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <a href="/" class="logo">
+          <div class="logo-icon">A</div>
+          <span>Analyze My Resume</span>
+        </a>
+        <a href="/index.html" class="cta-button">Launch App →</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>See Your Resume Through <span class="highlight">ATS Eyes</span></h1>
+        <p>90% of large companies use Applicant Tracking Systems. If your resume isn't optimized for ATS parsing, you might never reach a human recruiter—no matter how qualified you are.</p>
+        <a href="/index.html" class="cta-button">Analyze Your Resume — Free</a>
+      </div>
+    </section>
+
+    <section class="problem">
+      <div class="container">
+        <h2>The Problem: ATS Systems Parse Differently</h2>
+        <div class="problem-grid">
+          <div class="problem-card">
+            <h3>⚠️ Formatting Breaks</h3>
+            <p>Complex layouts, tables, and graphics confuse parsers. Your carefully designed resume becomes garbled text.</p>
+          </div>
+          <div class="problem-card">
+            <h3>⚠️ Missing Information</h3>
+            <p>Headers and footers get ignored. Contact info in the wrong place? You'll never hear back.</p>
+          </div>
+          <div class="problem-card">
+            <h3>⚠️ Keyword Mismatch</h3>
+            <p>Different systems look for different patterns. What works for one ATS fails on another.</p>
+          </div>
+        </div>
+        <p style="text-align: center; color: var(--text-dim); font-size: 18px; max-width: 700px; margin: 0 auto;">
+          Our tool validates your resume against the <strong>3 most universal ATS parsing methods</strong> to ensure maximum compatibility across all systems.
+        </p>
+      </div>
+    </section>
+
+    <section class="solution">
+      <div class="container">
+        <h2>How ATS Systems Really Read Your Resume</h2>
+        <p class="subtitle">We validate against all three methods to ensure universal compatibility</p>
+
+        <div class="ats-methods">
+          <div class="method-card">
+            <div class="method-number">1</div>
+            <h3>Plain Text Extraction</h3>
+            <p>The most universal method. ATS converts your document to plain text and reads it sequentially, top to bottom. This works because all file formats can be converted to text.</p>
+            <ul>
+              <li>Converts PDF/DOCX to raw text</li>
+              <li>Ignores formatting and graphics</li>
+              <li>Most resistant to layout variations</li>
+            </ul>
+          </div>
+
+          <div class="method-card">
+            <div class="method-number">2</div>
+            <h3>Pattern & Keyword Matching</h3>
+            <p>ATS looks for specific patterns using rules-based logic. Section headers, dates, email addresses, and phone numbers must follow recognizable formats.</p>
+            <ul>
+              <li>Regex patterns for contact info</li>
+              <li>Section header recognition</li>
+              <li>Date format detection</li>
+              <li>Degree and certification matching</li>
+            </ul>
+          </div>
+
+          <div class="method-card">
+            <div class="method-number">3</div>
+            <h3>NLP & AI Parsing</h3>
+            <p>Modern ATS systems use Natural Language Processing and AI to understand context. This is the most sophisticated method but not all systems have it.</p>
+            <ul>
+              <li>Named entity recognition (NER)</li>
+              <li>Contextual skill extraction</li>
+              <li>Job title identification</li>
+              <li>Semantic understanding</li>
+            </ul>
+          </div>
+        </div>
+
+        <p style="text-align: center; color: var(--amber); font-size: 16px; max-width: 800px; margin: 0 auto; padding: 24px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; border-left: 4px solid var(--amber);">
+          <strong>Our Advantage:</strong> We test your resume against all three methods. If your resume passes our validation, it will be readable by virtually any ATS system on the market.
+        </p>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <div class="container">
+        <h2>How It Works</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-icon">📄</div>
+            <h3>1. Upload Resume</h3>
+            <p>Drop your PDF resume into our analyzer. We support all standard resume formats.</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">🔍</div>
+            <h3>2. ATS X-Ray Scan</h3>
+            <p>We parse your resume using the same 3 methods that ATS systems use, highlighting issues in real-time.</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">⚡</div>
+            <h3>3. AI-Powered Fix</h3>
+            <p>Our AI identifies problems and suggests improvements to maximize ATS compatibility.</p>
+          </div>
+          <div class="step">
+            <div class="step-icon">✅</div>
+            <h3>4. Export & Apply</h3>
+            <p>Download your optimized resume and apply with confidence knowing it will be read correctly.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="container">
+        <h2>Why Analyze My Resume?</h2>
+        <p class="subtitle">Built on proven open-source technology, enhanced with AI</p>
+
+        <div class="feature-grid">
+          <div class="feature">
+            <h3>🎯 Triple-Method Validation</h3>
+            <p>Test against plain text, pattern matching, and NLP parsing—the 3 core ATS methods.</p>
+          </div>
+          <div class="feature">
+            <h3>🤖 AI-Powered Coaching</h3>
+            <p>Get intelligent suggestions for improving content, not just formatting.</p>
+          </div>
+          <div class="feature">
+            <h3>👁️ Visual X-Ray Mode</h3>
+            <p>See exactly what ATS systems see when they read your resume.</p>
+          </div>
+          <div class="feature">
+            <h3>🔒 Privacy First</h3>
+            <p>Your resume is processed locally in your browser. We never store or share your data.</p>
+          </div>
+          <div class="feature">
+            <h3>⚡ Real-Time Preview</h3>
+            <p>Make edits and see results instantly. No waiting, no uploads.</p>
+          </div>
+          <div class="feature">
+            <h3>💯 Free Forever</h3>
+            <p>Based on Open Resume's open-source foundation. Free tools for everyone.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container">
+        <h2>Stop Wondering. Start Knowing.</h2>
+        <p>Find out how ATS systems really see your resume—before you hit submit.</p>
+        <a href="/index.html" class="cta-button">Analyze My Resume Now →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Built with Open Resume technology. Enhanced with AI capabilities.</p>
+      <p style="margin-top: 8px; opacity: 0.6;">© 2026 Analyze My Resume. Your data stays on your device.</p>
+    </div>
+  </footer>
+</body>
+</html>
