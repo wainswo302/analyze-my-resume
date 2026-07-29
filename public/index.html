@@ -1121,6 +1121,171 @@ function hazards(lines,raw){
   return h;
 }
 
+/* ── ATS 3-Method Validation ── */
+function validateATSMethods(x, hazards) {
+  const methods = [];
+
+  // Method 1: Plain Text Extraction
+  const plainTextScore = () => {
+    let issues = [];
+    let score = 100;
+
+    // Check if there's enough text content
+    const totalText = x.lines.reduce((sum, l) => sum + l.text.length, 0);
+    if (totalText < 400) {
+      issues.push('Very low text content - may be a scan or image-based PDF');
+      score -= 50;
+    }
+
+    // Check for readable structure (sequential reading)
+    const hasName = x.profile.name && x.profile.name.length > 2;
+    const hasContact = x.profile.email || x.profile.phone;
+    if (!hasName) { issues.push('Name not clearly identified'); score -= 20; }
+    if (!hasContact) { issues.push('Contact information not found'); score -= 20; }
+
+    // Check for sections
+    if (x.sections.length < 2) {
+      issues.push('Very few sections detected');
+      score -= 15;
+    }
+
+    const status = score >= 80 ? 'pass' : score >= 50 ? 'warn' : 'fail';
+    const result = status === 'pass'
+      ? `✓ Pass (${score}/100) - Text extracts cleanly and sequentially.`
+      : `Score: ${score}/100. Issues: ${issues.join('; ')}`;
+
+    return { status, result };
+  };
+
+  // Method 2: Pattern & Keyword Matching
+  const patternMatchScore = () => {
+    let issues = [];
+    let score = 100;
+
+    // Check contact info patterns
+    const emailMatch = x.profile.email && RE.email.test(x.profile.email);
+    const phoneMatch = x.profile.phone && RE.phone.test(x.profile.phone);
+
+    if (!emailMatch) { issues.push('Email format not recognized'); score -= 15; }
+    if (!phoneMatch) { issues.push('Phone format not recognized'); score -= 10; }
+
+    // Check for standard section headers
+    const canonSections = CANON.filter(c => x.report.some(r => r.type === c));
+    const missingSections = CANON.filter(c => !x.report.some(r => r.type === c));
+    if (missingSections.length >= 2) {
+      issues.push(`Missing standard sections: ${missingSections.join(', ')}`);
+      score -= missingSections.length * 10;
+    }
+
+    // Check date patterns in work/education
+    let datesFound = 0;
+    x.sections.forEach(s => {
+      if (s.type === 'work' || s.type === 'education') {
+        s.items.forEach(item => {
+          if (item.when && (RE.dateRange.test(item.when) || RE.anyDate.test(item.when))) {
+            datesFound++;
+          }
+        });
+      }
+    });
+    if (datesFound === 0 && x.sections.some(s => s.type === 'work' || s.type === 'education')) {
+      issues.push('Date formats not recognized in work/education');
+      score -= 15;
+    }
+
+    const status = score >= 75 ? 'pass' : score >= 50 ? 'warn' : 'fail';
+    const result = status === 'pass'
+      ? `✓ Pass (${score}/100) - Standard patterns and keywords recognized.`
+      : `Score: ${score}/100. Issues: ${issues.join('; ')}`;
+
+    return { status, result };
+  };
+
+  // Method 3: NLP & AI Parsing
+  const nlpScore = () => {
+    let issues = [];
+    let score = 100;
+
+    // Check for structural clarity (helps NLP)
+    const multiColumnIssue = hazards.some(h => h[0] === 'bad' && h[1].includes('Multi-column'));
+    const imageIssue = hazards.some(h => h[1].includes('image'));
+    const headerFooterIssue = hazards.some(h => h[1].includes('header/footer'));
+
+    if (multiColumnIssue) {
+      issues.push('Multi-column layout confuses semantic parsing');
+      score -= 30;
+    }
+    if (imageIssue) {
+      issues.push('Images prevent content extraction');
+      score -= 15;
+    }
+    if (headerFooterIssue) {
+      issues.push('Critical info in header/footer zones may be ignored');
+      score -= 10;
+    }
+
+    // Check for contextual richness (bullet points, descriptions)
+    let bulletCount = 0;
+    x.sections.forEach(s => {
+      if (s.type === 'work' || s.type === 'education' || s.type === 'projects') {
+        s.items.forEach(item => {
+          if (item.bullets && item.bullets.length > 0) {
+            bulletCount += item.bullets.length;
+          }
+        });
+      }
+    });
+
+    if (bulletCount < 5 && x.sections.some(s => s.type === 'work')) {
+      issues.push('Limited descriptive content for NLP to analyze');
+      score -= 10;
+    }
+
+    // Check for skills section (important for NLP keyword extraction)
+    const hasSkills = x.sections.some(s => s.type === 'skills');
+    if (!hasSkills) {
+      issues.push('No skills section found - limits keyword matching');
+      score -= 10;
+    }
+
+    const status = score >= 75 ? 'pass' : score >= 50 ? 'warn' : 'fail';
+    const result = status === 'pass'
+      ? `✓ Pass (${score}/100) - Structure supports semantic understanding.`
+      : `Score: ${score}/100. Issues: ${issues.join('; ')}`;
+
+    return { status, result };
+  };
+
+  const method1 = plainTextScore();
+  methods.push({
+    number: 1,
+    name: 'Plain Text Extraction',
+    description: 'Tests if your resume converts to readable plain text in correct sequential order.',
+    status: method1.status,
+    result: method1.result
+  });
+
+  const method2 = patternMatchScore();
+  methods.push({
+    number: 2,
+    name: 'Pattern & Keyword Matching',
+    description: 'Tests if contact info, dates, and section headers follow recognizable patterns.',
+    status: method2.status,
+    result: method2.result
+  });
+
+  const method3 = nlpScore();
+  methods.push({
+    number: 3,
+    name: 'NLP & AI Parsing',
+    description: 'Tests if structure supports semantic analysis and contextual understanding.',
+    status: method3.status,
+    result: method3.result
+  });
+
+  return methods;
+}
+
 /* ── the X-Ray report ── */
 function renderXray(x){
   XRAY=x;
@@ -1154,6 +1319,24 @@ function renderXray(x){
 
   const missing=CANON.filter(c=>!x.report.some(r=>r.type===c));
   if(missing.length)html+=`<div class="note warn"><b>No section found for: ${missing.join(', ')}</b><br>Either the heading is worded in a way the parser didn't recognise, or the section isn't there. Standard headings are safest.</div>`;
+
+  // ATS 3-Method Validation
+  html+=`<div class="sect-label"><span>ATS Compatibility Check</span></div>`;
+  const atsValidation = validateATSMethods(x, hz);
+  html+=`<div class="note" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; margin-bottom: 12px;">
+    <b>3-Method ATS Validation</b><br>
+    We validate your resume against the three universal ATS parsing methods used by most tracking systems.
+  </div>`;
+
+  atsValidation.forEach(method => {
+    const icon = method.status === 'pass' ? '✓' : method.status === 'warn' ? '⚠' : '✗';
+    const statusClass = method.status === 'pass' ? '' : method.status === 'warn' ? 'warn' : 'bad';
+    html+=`<div class="note ${statusClass}">
+      <b>${icon} Method ${method.number}: ${esc(method.name)}</b><br>
+      ${esc(method.description)}<br>
+      <span style="margin-top:6px;display:block;font-size:12px;opacity:0.9">${esc(method.result)}</span>
+    </div>`;
+  });
 
   html+=`<div class="row" style="margin-top:12px">
     <button class="mini go" onclick="adoptParse()">Load this into the editor</button>
